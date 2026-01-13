@@ -32,6 +32,9 @@ src/main/java/com/nibm/echannelling/echannelingapplication/config/
 # Security folder
 src/main/java/com/nibm/echannelling/echannelingapplication/security/
 
+# Util folder
+src/main/java/com/nibm/echannelling/echannelingapplication/util/
+
 # Keys
 *.key
 *.pem
