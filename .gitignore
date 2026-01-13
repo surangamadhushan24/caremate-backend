@@ -1,0 +1,35 @@
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ / Eclipse / VSCode
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / secret files
+.env
+application-dev.properties
+application-prod.properties
+application-test.properties
+application-local.yml
+
+# Config folder
+src/main/java/com/nibm/echannelling/echannelingapplication/config/
+
+# Keys
+*.key
+*.pem
+*.p12

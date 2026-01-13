@@ -1,0 +1,45 @@
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/echannellingdb
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:1234}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+  ai:
+    openai:
+      enabled: false
+
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000
+
+payhere:
+  merchant:
+    id: ${PAYHERE_MERCHANT_ID}
+    secret: ${PAYHERE_MERCHANT_SECRET}
+  base:
+    url: https://sandbox.payhere.lk
+
+server:
+  tomcat:
+    max-http-form-post-size: 10MB
+    max-swallow-size: 10MB
+    connector:
+      nio:
+        buffer-size: 65536
+
+openrouter:
+  api:
+    key: ${OPENROUTER_API_KEY}
+    url: https://openrouter.ai/api/v1/completions
+
+
