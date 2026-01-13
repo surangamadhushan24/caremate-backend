@@ -1,112 +1,146 @@
-# Echanneling Application
+# CareMate Backend
 
-This is a Spring Boot-based web application for managing e-channeling services, including appointments, doctors, patients, feedback, notifications, payments, prescriptions, and video calls.
+A comprehensive Spring Boot-based backend application for managing e-channeling services, providing a complete healthcare appointment and management system.
 
 ## Features
 
 ### User Management
-- Secure user authentication and authorization using JWT
-- Role-based access for Admin, Doctor, and Patient
-- Change password and profile management
+- Secure JWT-based authentication and authorization
+- Role-based access control (Admin, Doctor, Patient)
+- User profile management and password updates
 
-### Appointment System
-- Book, update, and cancel appointments
-- View appointment history
+### Appointment Management
+- Online appointment booking and scheduling
+- Appointment status tracking and history
 - Doctor availability management
 
-### Doctor & Patient Management
-- Add, update, and delete doctor and patient profiles
-- Search and filter doctors by specialization
+### Healthcare Professionals
+- Doctor profile management
+- Specialization-based doctor search
+- Patient management for doctors
 
-### Feedback & Notification
-- Submit and view feedback
-- Automated notifications for appointments and updates
+### Communication & Feedback
+- Real-time notifications system
+- Feedback collection and management
+- Integrated chatbot for user assistance
 
-### Payment Processing
-- Online payment integration for appointments
-- Payment history and receipts
+### Payment Integration
+- Secure online payment processing
+- Payment history and transaction management
+- Integration with PayHere payment gateway
 
-### Prescription Management
-- Doctors can create and manage prescriptions
-- Patients can view and download prescriptions
+### Medical Records
+- Digital prescription management
+- Prescription access for patients
+- Medical history tracking
 
-### Video Call Integration
-- Schedule and join video consultations
+### Telemedicine
+- Video consultation scheduling
+- Virtual meeting integration
 
-### Analytics & Reporting
-- Admin dashboard for analytics and reports
+### Analytics Dashboard
+- Administrative reporting and analytics
+- System usage statistics
+- Performance monitoring
 
-### RESTful API Endpoints
-- Well-documented APIs for all major features
+## Technology Stack
+- **Java 17+**
+- **Spring Boot** - Framework
+- **Spring Security** - Authentication & Authorization
+- **Spring Data JPA** - Data persistence
+- **PostgreSQL** - Database
+- **JWT** - Token-based security
+- **Maven** - Build tool
+- **RESTful APIs** - Communication
 
-### Other Features
-Chatbot integration for user queries
-
-## Technologies Used
-- Java 17+
-- Spring Boot
-- Maven
-- Spring Security (JWT)
-- Thymeleaf (for templates)
-- REST APIs
-
-## Project Structure
+## Project Architecture
 ```
 src/
-  main/
-    java/
-      com/nibm/echannelling/echannelingapplication/
-        config/
-        controller/
-        dto/
-        entity/
-        exception/
-        repository/
-        security/
-        service/
-        util/
-    resources/
-      application.yml
-      static/
-      templates/
-  test/
-    java/
-      com/nibm/echannelling/echannelingapplication/
+├── main/
+│   ├── java/com/nibm/echannelling/echannelingapplication/
+│   │   ├── config/          # Configuration classes
+│   │   ├── controller/      # REST API endpoints
+│   │   ├── dto/            # Data Transfer Objects
+│   │   ├── entity/         # JPA entities
+│   │   ├── exception/      # Global exception handling
+│   │   ├── repository/     # Data access layer
+│   │   ├── security/       # Security configurations
+│   │   ├── service/        # Business logic
+│   │   └── util/           # Utility classes
+│   └── resources/
+│       ├── application.yml      # Main configuration
+│       └── application-local.yml # Local environment config
+└── test/
+    └── java/com/nibm/echannelling/echannelingapplication/
+        └── EchannelingApplicationTests.java
 ```
 
 ## Getting Started
 
 ### Prerequisites
 - Java 17 or higher
-- Maven
+- Maven 3.6+
+- PostgreSQL database
 
-### Build and Run
-1. Clone the repository:
-   ```sh
-   git clone <repo-url>
+### Installation & Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/surangamadhushan24/caremate-backend.git
+   cd caremate-backend
    ```
-2. Navigate to the project directory:
-   ```sh
-   cd echanneling-application
-   ```
-3. Build the project:
-   ```sh
+
+2. **Configure Database**
+   - Create a PostgreSQL database named `echannellingdb`
+   - Update database credentials in `src/main/resources/application-local.yml`
+
+3. **Build the Application**
+   ```bash
    mvn clean install
    ```
-4. Run the application:
-   ```sh
+
+4. **Run the Application**
+   ```bash
    mvn spring-boot:run
    ```
 
-### Access
-- The application will be available at `http://localhost:8080`
+5. **Access the Application**
+   - API endpoints available at: `http://localhost:8080`
+   - Swagger documentation (if configured) for API testing
 
 ## Configuration
-- Main configuration file: `src/main/resources/application.yml`
-- Update database and other service credentials as needed.
+
+### Environment Variables
+The application uses environment variables for sensitive configuration:
+- `DB_USERNAME` - Database username
+- `DB_PASSWORD` - Database password
+- `JWT_SECRET` - JWT signing secret
+- `PAYHERE_MERCHANT_ID` - PayHere merchant ID
+- `PAYHERE_MERCHANT_SECRET` - PayHere merchant secret
+- `OPENROUTER_API_KEY` - OpenRouter API key
+
+### Local Development
+- Copy `application-local.yml` and configure local settings
+- This file is gitignored for security
+
+## API Documentation
+
+The application provides RESTful APIs for:
+- User authentication and management
+- Appointment scheduling
+- Doctor and patient management
+- Payment processing
+- Notification services
+- Analytics and reporting
 
 ## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-## License
-This project is licensed under the MIT License.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Support
+
+For questions or support, please open an issue in the GitHub repository.
