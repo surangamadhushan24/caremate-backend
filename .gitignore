@@ -29,6 +29,9 @@ application-local.yml
 # Config folder
 src/main/java/com/nibm/echannelling/echannelingapplication/config/
 
+# Security folder
+src/main/java/com/nibm/echannelling/echannelingapplication/security/
+
 # Keys
 *.key
 *.pem
