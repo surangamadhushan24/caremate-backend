@@ -8,6 +8,8 @@ import lombok.Data;
 public class RegisterRequest {
     private String email;
     private String password;
+
+    //TODO role should be removed
     private String role;
     private String name;
     private Integer age;
