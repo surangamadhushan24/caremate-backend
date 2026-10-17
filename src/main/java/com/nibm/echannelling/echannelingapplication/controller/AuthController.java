@@ -1,11 +1,7 @@
 package com.nibm.echannelling.echannelingapplication.controller;
 
 import com.nibm.echannelling.echannelingapplication.config.JwtUtils;
-import com.nibm.echannelling.echannelingapplication.dto.AuthRequest;
-import com.nibm.echannelling.echannelingapplication.dto.AuthResponse;
-import com.nibm.echannelling.echannelingapplication.dto.ChangePasswordRequest;
-import com.nibm.echannelling.echannelingapplication.dto.RegisterRequest;
-import com.nibm.echannelling.echannelingapplication.dto.UserDTO;
+import com.nibm.echannelling.echannelingapplication.dto.*;
 import com.nibm.echannelling.echannelingapplication.entity.Doctor;
 import com.nibm.echannelling.echannelingapplication.entity.Patient;
 import com.nibm.echannelling.echannelingapplication.entity.Role;
@@ -36,17 +32,23 @@ public class AuthController {
         this.doctorRepository = doctorRepository;
     }
 
+//    @PostMapping("/register")
+//    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+//        System.out.println("Register request received for email: " + request.getEmail());
+//        try {
+//            authService.register(request);
+//            System.out.println("User registered successfully: " + request.getEmail());
+//            return ResponseEntity.ok("Registration successful");
+//        } catch (Exception e) {
+//            System.out.println("Registration failed: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
+//    }
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
-        System.out.println("Register request received for email: " + request.getEmail());
-        try {
+    public ResponseEntity<ApiResponse<Void>> register(@RequestBody RegisterRequest request) {
             authService.register(request);
             System.out.println("User registered successfully: " + request.getEmail());
-            return ResponseEntity.ok("Registration successful");
-        } catch (Exception e) {
-            System.out.println("Registration failed: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true,"Registration successful",null));
     }
 
     @PostMapping("/login")

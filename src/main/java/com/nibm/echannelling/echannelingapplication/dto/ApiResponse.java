@@ -1,5 +1,7 @@
 package com.nibm.echannelling.echannelingapplication.dto;
 
+import java.util.ArrayList;
+
 public class ApiResponse<T>{
     private boolean success;
     private String message;
@@ -22,5 +24,6 @@ public class ApiResponse<T>{
 
     public T getData() {
         return data;
+       
     }
 }
