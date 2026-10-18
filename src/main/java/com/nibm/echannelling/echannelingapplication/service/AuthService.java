@@ -10,6 +10,7 @@ import com.nibm.echannelling.echannelingapplication.entity.Doctor;
 import com.nibm.echannelling.echannelingapplication.entity.Patient;
 import com.nibm.echannelling.echannelingapplication.entity.Role;
 import com.nibm.echannelling.echannelingapplication.entity.User;
+import com.nibm.echannelling.echannelingapplication.exception.InvalidCredentialsException;
 import com.nibm.echannelling.echannelingapplication.repository.DoctorRepository;
 import com.nibm.echannelling.echannelingapplication.repository.PatientRepository;
 import com.nibm.echannelling.echannelingapplication.repository.UserRepository;
@@ -36,7 +37,7 @@ public class AuthService {
 
     public AuthResponse login(AuthRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
         if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             String token = jwtUtils.generateToken(user);
             String name = null;
@@ -54,7 +55,7 @@ public class AuthService {
             UserDTO userDTO = new UserDTO(name, user.getRole().name(), user.getEmail());
             return new AuthResponse(token, userDTO);
         }
-        throw new RuntimeException("Invalid credentials");
+        throw new InvalidCredentialsException("Invalid email or password");
     }
 
     public void register(RegisterRequest request) {
