@@ -1,16 +1,15 @@
 package com.nibm.echannelling.echannelingapplication.service;
 
 import com.nibm.echannelling.echannelingapplication.config.JwtUtils;
-import com.nibm.echannelling.echannelingapplication.dto.AuthRequest;
-import com.nibm.echannelling.echannelingapplication.dto.AuthResponse;
-import com.nibm.echannelling.echannelingapplication.dto.ChangePasswordRequest;
-import com.nibm.echannelling.echannelingapplication.dto.RegisterRequest;
-import com.nibm.echannelling.echannelingapplication.dto.UserDTO;
+import com.nibm.echannelling.echannelingapplication.dto.*;
 import com.nibm.echannelling.echannelingapplication.entity.Doctor;
 import com.nibm.echannelling.echannelingapplication.entity.Patient;
 import com.nibm.echannelling.echannelingapplication.entity.Role;
 import com.nibm.echannelling.echannelingapplication.entity.User;
+import com.nibm.echannelling.echannelingapplication.exception.BadRequestException;
+import com.nibm.echannelling.echannelingapplication.exception.ConflictException;
 import com.nibm.echannelling.echannelingapplication.exception.InvalidCredentialsException;
+import com.nibm.echannelling.echannelingapplication.exception.ResourceNotFoundException;
 import com.nibm.echannelling.echannelingapplication.repository.DoctorRepository;
 import com.nibm.echannelling.echannelingapplication.repository.PatientRepository;
 import com.nibm.echannelling.echannelingapplication.repository.UserRepository;
@@ -43,14 +42,14 @@ public class AuthService {
             String name = null;
             if (user.getRole() == Role.PATIENT) {
                 Patient patient = patientRepository.findByUser(user)
-                        .orElseThrow(() -> new RuntimeException("Patient not found"));
+                        .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
                 name = patient.getName();
             } else if (user.getRole() == Role.DOCTOR) {
                 Doctor doctor = doctorRepository.findByUser(user)
-                        .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                        .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
                 name = doctor.getName();
             } else {
-                throw new RuntimeException("Unsupported role");
+                throw new BadRequestException("Unsupported role");
             }
             UserDTO userDTO = new UserDTO(name, user.getRole().name(), user.getEmail());
             return new AuthResponse(token, userDTO);
@@ -60,7 +59,13 @@ public class AuthService {
 
     public void register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
+            throw new ConflictException("Email already exists");
+        }
+        if (request.getRole() == null ||
+                (!request.getRole().equals("PATIENT") &&
+                        !request.getRole().equals("DOCTOR"))) {
+
+            throw new BadRequestException("Invalid user role");
         }
         User user = new User();
         user.setEmail(request.getEmail());
@@ -89,7 +94,7 @@ public class AuthService {
 
     public void changePassword(String email, ChangePasswordRequest request) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String currentPassword = request.getCurrentPassword() != null ? request.getCurrentPassword().trim() : "";
         String newPassword = request.getNewPassword() != null ? request.getNewPassword().trim() : "";
@@ -101,22 +106,22 @@ public class AuthService {
 
         if (currentPassword.isEmpty()) {
             System.out.println("Current password is empty");
-            throw new RuntimeException("Current password cannot be empty");
+            throw new BadRequestException("Current password cannot be empty");
         }
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             System.out.println("Password match failed");
-            throw new RuntimeException("Current password is incorrect. Please verify your password or try logging in again.");
+            throw new InvalidCredentialsException("Current password is incorrect. Please verify your password or try logging in again.");
         }
 
         if (!newPassword.equals(confirmPassword)) {
             System.out.println("New passwords do not match");
-            throw new RuntimeException("New passwords do not match");
+            throw new BadRequestException("New passwords do not match");
         }
 
         if (newPassword.length() < 8) {
             System.out.println("New password is too short");
-            throw new RuntimeException("New password must be at least 8 characters long");
+            throw new BadRequestException("New password must be at least 8 characters long");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
