@@ -100,32 +100,24 @@ public class AuthService {
         String newPassword = request.getNewPassword() != null ? request.getNewPassword().trim() : "";
         String confirmPassword = request.getConfirmPassword() != null ? request.getConfirmPassword().trim() : "";
 
-        System.out.println("Attempting password change for email: " + email);
-        System.out.println("Provided current password: [HIDDEN]");
-        System.out.println("Stored password hash: " + user.getPassword());
-
         if (currentPassword.isEmpty()) {
-            System.out.println("Current password is empty");
             throw new BadRequestException("Current password cannot be empty");
         }
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            System.out.println("Password match failed");
             throw new InvalidCredentialsException("Current password is incorrect. Please verify your password or try logging in again.");
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            System.out.println("New passwords do not match");
             throw new BadRequestException("New passwords do not match");
         }
 
         if (newPassword.length() < 8) {
-            System.out.println("New password is too short");
             throw new BadRequestException("New password must be at least 8 characters long");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-        System.out.println("Password changed successfully for email: " + email);
+
     }
 }
