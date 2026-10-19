@@ -43,6 +43,24 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidCredentials(
+            InvalidCredentialsException ex) {
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiResponse<>(
+                        false, ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBadRequest(
+            BadRequestException ex) {
+
+        return ResponseEntity.badRequest()
+                .body(new ApiResponse<>(
+                        false, ex.getMessage(), null));
+    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Void>> handleValidation(
@@ -97,14 +115,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ChatResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
-        ChatResponse response = new ChatResponse();
-        response.setResponse(ex.getMessage());
-        response.setSuggestedSpecialty(null);
-        response.setRecommendedDoctorIds(new Long[]{});
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-    }
+
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ChatResponse> handleRuntimeException(RuntimeException ex) {
@@ -115,12 +126,5 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ChatResponse> handleGeneralException(Exception ex) {
-        ChatResponse response = new ChatResponse();
-        response.setResponse("An unexpected error occurred. Please try again later.");
-        response.setSuggestedSpecialty(null);
-        response.setRecommendedDoctorIds(new Long[]{});
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-    }
+
 }
