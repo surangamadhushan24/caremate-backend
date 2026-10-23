@@ -45,28 +45,13 @@ public class AuthController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<String> changePassword(@RequestHeader("Authorization") String authHeader,
+    public ResponseEntity<ApiResponse<Void>> changePassword(Authentication authentication,
                                                  @RequestBody ChangePasswordRequest request) {
-        System.out.println("Change password request received");
-        try {
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                System.out.println("Invalid authorization header");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid authorization header");
-            }
-            String token = authHeader.substring(7);
 
-            if (!jwtUtils.validateToken(token)) {
-                System.out.println("Invalid or expired token");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
-            }
-
-            String email = jwtUtils.getEmailFromToken(token);
+            String email = authentication.getName();
             authService.changePassword(email, request);
-            System.out.println("Password changed successfully for email: " + email);
-            return ResponseEntity.ok("Password changed successfully");
-        } catch (Exception e) {
-            System.out.println("Change password failed: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>( true,"Password changed successfully", null));
+
+
     }
 }
