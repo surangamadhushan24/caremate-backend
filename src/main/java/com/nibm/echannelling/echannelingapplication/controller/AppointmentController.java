@@ -5,49 +5,8 @@ import com.nibm.echannelling.echannelingapplication.entity.Appointment;
 import com.nibm.echannelling.echannelingapplication.service.AppointmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-
-
 import java.util.List;
 
-//@RestController
-//@RequestMapping("/appointments")
-//public class AppointmentController {
-//    private final AppointmentService appointmentService;
-//
-//    public AppointmentController(AppointmentService appointmentService) {
-//        this.appointmentService = appointmentService;
-//    }
-//
-//    @PostMapping
-//    public void createAppointment(@RequestBody AppointmentDTO dto) {
-//        appointmentService.createAppointment(dto);
-//    }
-//
-//    @GetMapping
-//    public List<Appointment> getMyAppointments() {
-//        return appointmentService.getMyAppointments();
-//    }
-//
-//    @GetMapping("/doctor")
-//    public List<Appointment> getDoctorAppointments() {
-//        return appointmentService.getDoctorAppointments();
-//    }
-//
-//    @PutMapping("/{id}/status")
-//    public void updateStatus(@PathVariable Long id, @RequestBody String status) {
-//        appointmentService.updateStatus(id, status);
-//    }
-
-
-
-import com.nibm.echannelling.echannelingapplication.dto.AppointmentDTO;
-import com.nibm.echannelling.echannelingapplication.entity.Appointment;
-import com.nibm.echannelling.echannelingapplication.service.AppointmentService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/appointments")
