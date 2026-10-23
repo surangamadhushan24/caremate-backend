@@ -11,7 +11,6 @@ import com.nibm.echannelling.echannelingapplication.exception.ConflictException;
 import com.nibm.echannelling.echannelingapplication.exception.InvalidCredentialsException;
 import com.nibm.echannelling.echannelingapplication.exception.ResourceNotFoundException;
 import com.nibm.echannelling.echannelingapplication.mapper.AccountMapper;
-import com.nibm.echannelling.echannelingapplication.mapper.UserMapper;
 import com.nibm.echannelling.echannelingapplication.repository.DoctorRepository;
 import com.nibm.echannelling.echannelingapplication.repository.PatientRepository;
 import com.nibm.echannelling.echannelingapplication.repository.UserRepository;
