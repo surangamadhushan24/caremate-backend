@@ -1,12 +1,9 @@
 package com.nibm.echannelling.echannelingapplication.dto;
 
-import java.util.ArrayList;
-
-public class ApiResponse<T>{
+public class ApiResponse<T> {
     private boolean success;
     private String message;
     private T data;
-
 
     public ApiResponse(boolean success, String message, T data) {
         this.success = success;
@@ -14,16 +11,20 @@ public class ApiResponse<T>{
         this.data = data;
     }
 
-    public boolean isSuccess() {
-        return success;
+    public static <T> ApiResponse<T> success(String message, T data) {
+        return new ApiResponse<>(true, message, data);
     }
 
-    public String getMessage() {
-        return message;
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>(true, "Success", data);
     }
 
-    public T getData() {
-        return data;
-       
+    public static <T> ApiResponse<T> error(String message) {
+        return new ApiResponse<>(false, message, null);
     }
+
+
+    public boolean isSuccess() { return success; }
+    public String getMessage() { return message; }
+    public T getData() { return data; }
 }
