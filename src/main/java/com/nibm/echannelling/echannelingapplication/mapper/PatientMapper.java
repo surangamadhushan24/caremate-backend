@@ -14,6 +14,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring")
 public interface PatientMapper {
 
+    @Mapping(source = "user.email", target = "email")
     PatientDTO toDto(Patient patient);
 
 

@@ -1,6 +1,6 @@
 package com.nibm.echannelling.echannelingapplication.controller;
 
-import com.nibm.echannelling.echannelingapplication.config.JwtUtils;
+
 import com.nibm.echannelling.echannelingapplication.dto.*;
 import com.nibm.echannelling.echannelingapplication.service.AuthService;
 import org.springframework.http.HttpStatus;
