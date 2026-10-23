@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
     private final AuthService authService;
-    private final JwtUtils jwtUtils;
 
 
-    public AuthController(AuthService authService, JwtUtils jwtUtils) {
+
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.jwtUtils = jwtUtils;
+
 
     }
     @PostMapping("/register")
