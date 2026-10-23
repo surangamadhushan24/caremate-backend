@@ -5,7 +5,7 @@ public class UserDTO {
     private String role;
     private String email;
 
-    // Add other fields as needed
+
     public UserDTO(String name, String role, String email) {
         this.name = name;
         this.role = role;

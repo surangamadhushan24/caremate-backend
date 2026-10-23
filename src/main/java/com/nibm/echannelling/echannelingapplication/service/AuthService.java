@@ -10,6 +10,8 @@ import com.nibm.echannelling.echannelingapplication.exception.BadRequestExceptio
 import com.nibm.echannelling.echannelingapplication.exception.ConflictException;
 import com.nibm.echannelling.echannelingapplication.exception.InvalidCredentialsException;
 import com.nibm.echannelling.echannelingapplication.exception.ResourceNotFoundException;
+import com.nibm.echannelling.echannelingapplication.mapper.AccountMapper;
+import com.nibm.echannelling.echannelingapplication.mapper.UserMapper;
 import com.nibm.echannelling.echannelingapplication.repository.DoctorRepository;
 import com.nibm.echannelling.echannelingapplication.repository.PatientRepository;
 import com.nibm.echannelling.echannelingapplication.repository.UserRepository;
@@ -23,15 +25,18 @@ public class AuthService {
     private final DoctorRepository doctorRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final AccountMapper accountMapper;
 
     public AuthService(UserRepository userRepository, PatientRepository patientRepository,
                        DoctorRepository doctorRepository, PasswordEncoder passwordEncoder,
-                       JwtUtils jwtUtils) {
+                       JwtUtils jwtUtils, AccountMapper accountMapper) {
         this.userRepository = userRepository;
         this.patientRepository = patientRepository;
         this.doctorRepository = doctorRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
+        this.accountMapper = accountMapper;
+
     }
 
     public AuthResponse login(AuthRequest request) {
@@ -118,6 +123,14 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+
+    }
+
+    public AccountDto getCurrentUser(String name) {
+        User currentUser= userRepository.findByEmail(name).orElseThrow(()->new ResourceNotFoundException("User Not found"));
+
+        return accountMapper.toDto(currentUser);
+
 
     }
 }

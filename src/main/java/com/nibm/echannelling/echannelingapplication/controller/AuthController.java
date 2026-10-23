@@ -35,11 +35,11 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserDTO>> getCurrentUser(Authentication authentication) {
+    public ResponseEntity<ApiResponse<AccountDto>> getCurrentUser(Authentication authentication) {
 
-        UserDTO userDTO = authService.getCurrentUser(authentication.getName());
+        AccountDto user= authService.getCurrentUser(authentication.getName());
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ApiResponse<>(true,"User details fetched successfully",userDTO)
+                new ApiResponse<>(true,"User details fetched successfully",user)
         );
 
     }

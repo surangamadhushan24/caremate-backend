@@ -6,7 +6,7 @@ import lombok.Data;
 
 public class AuthResponse {
     private String token;
-    private UserDTO user; // Add user object
+    private UserDTO user;
 
     public AuthResponse(String token, UserDTO user) {
         this.token = token;
