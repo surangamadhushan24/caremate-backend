@@ -1,6 +1,5 @@
+
 package com.nibm.echannelling.echannelingapplication.mapper;
-
-
 
 import com.nibm.echannelling.echannelingapplication.dto.PatientDTO;
 import com.nibm.echannelling.echannelingapplication.dto.UpdatePatientRequest;
@@ -17,10 +16,14 @@ public interface PatientMapper {
     @Mapping(source = "user.email", target = "email")
     PatientDTO toDto(Patient patient);
 
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @BeanMapping(
+            nullValuePropertyMappingStrategy =
+                    NullValuePropertyMappingStrategy.IGNORE
+    )
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "email", ignore = true)
-
-    void updateFromRequest(UpdatePatientRequest request, @MappingTarget Patient patient);
+    @Mapping(target = "user", ignore = true)
+    void updateFromRequest(
+            UpdatePatientRequest request,
+            @MappingTarget Patient patient
+    );
 }
