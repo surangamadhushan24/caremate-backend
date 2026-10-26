@@ -125,11 +125,28 @@ public class AuthService {
 
     }
 
-    public AccountDto getCurrentUser(String name) {
-        User currentUser= userRepository.findByEmail(name).orElseThrow(()->new ResourceNotFoundException("User Not found"));
+    public AccountDto getCurrentUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        return accountMapper.toDto(currentUser);
+        String name = null;
 
+        if (user.getRole() == Role.DOCTOR) {
+            Doctor doctor = doctorRepository.findByUser(user)
+                    .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
+            name = doctor.getName();
+        }
+        else if (user.getRole() == Role.PATIENT) {
+            Patient patient = patientRepository.findByUser(user)
+                    .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
+            name = patient.getName();
+        }
 
+        AccountDto dto = new AccountDto();
+        dto.setEmail(user.getEmail());
+        dto.setRole(user.getRole().name());
+        dto.setName(name);
+
+        return dto;
     }
 }
