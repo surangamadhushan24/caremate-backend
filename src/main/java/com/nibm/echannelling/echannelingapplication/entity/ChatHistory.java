@@ -2,12 +2,14 @@ package com.nibm.echannelling.echannelingapplication.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "chat_history")
-@Data
+@Getter
+@Setter
 public class ChatHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
