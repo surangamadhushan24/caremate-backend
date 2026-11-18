@@ -21,10 +21,10 @@ public class Doctor {
     private String name;
 
     private String specialty;
-
+    private String phone;
+    private Integer yearsOfExperience;
+    private String bio;
+    private String education;
     private String availability;
-
-    private Boolean verified;
-
-
+    private Boolean verified = false;
 }

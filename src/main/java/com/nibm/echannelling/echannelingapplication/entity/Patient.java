@@ -1,7 +1,5 @@
 package com.nibm.echannelling.echannelingapplication.entity;
 
-
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,10 +21,13 @@ public class Patient {
     private String name;
 
     private Integer age;
-
     private String gender;
-
+    private String phone;
+    private String address;
+    private String city;
+    private String country;
+    private String bloodType;
+    private Integer height;
+    private Integer weight;
     private String symptoms;
-
-
 }
