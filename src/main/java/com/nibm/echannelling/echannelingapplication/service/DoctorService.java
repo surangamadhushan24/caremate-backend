@@ -7,6 +7,7 @@ import com.nibm.echannelling.echannelingapplication.exception.ResourceNotFoundEx
 import com.nibm.echannelling.echannelingapplication.mapper.DoctorMapper;
 import com.nibm.echannelling.echannelingapplication.repository.DoctorRepository;
 import com.nibm.echannelling.echannelingapplication.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -57,23 +58,50 @@ public class DoctorService {
     public List<DoctorDTO> getDoctorsBySpecialty(String specialty) {
         return doctorMapper.toDtoList(doctorRepository.findBySpecialty(specialty));
     }
+    @Transactional
     public DoctorDTO updateProfile(DoctorDTO profileData) {
+
+        System.out.println("========== UPDATE PROFILE ==========");
+        System.out.println("Received name: " + profileData.getName());
+        System.out.println("Received phone: " + profileData.getPhone());
+        System.out.println("Received specialty: " + profileData.getSpecialty());
+        System.out.println("Received experience: " + profileData.getYearsOfExperience());
+        System.out.println("Received bio: " + profileData.getBio());
+        System.out.println("Received education: " + profileData.getEducation());
+        System.out.println("Received email: " + profileData.getEmail());
+
         Doctor doctor = getCurrentDoctorEntity();
 
-        // MapStruct will only update non-null fields
+        System.out.println("Before mapping: " + doctor.getName());
+
         doctorMapper.updateEntityFromDto(profileData, doctor);
 
-        // Handle email separately (it lives on User)
-        if (profileData.getEmail() != null && !profileData.getEmail().isBlank()) {
+        System.out.println("========== AFTER MAPPING ==========");
+        System.out.println("Name: " + doctor.getName());
+        System.out.println("Phone: " + doctor.getPhone());
+        System.out.println("Specialty: " + doctor.getSpecialty());
+        System.out.println("Experience: " + doctor.getYearsOfExperience());
+        System.out.println("Bio: " + doctor.getBio());
+        System.out.println("Education: " + doctor.getEducation());
+
+        if (profileData.getEmail() != null &&
+                !profileData.getEmail().isBlank()) {
+
             User user = doctor.getUser();
+
             if (!user.getEmail().equalsIgnoreCase(profileData.getEmail())
                     && userRepository.existsByEmail(profileData.getEmail())) {
                 throw new RuntimeException("Email already in use");
             }
+
             user.setEmail(profileData.getEmail());
         }
 
         Doctor saved = doctorRepository.save(doctor);
+
+        System.out.println("========== SAVED PROFILE ==========");
+        System.out.println("Saved name: " + saved.getName());
+
         return doctorMapper.toDto(saved);
     }
 
