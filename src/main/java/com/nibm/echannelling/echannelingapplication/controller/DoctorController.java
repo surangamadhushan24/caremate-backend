@@ -39,12 +39,21 @@ public class DoctorController {
 
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse<DoctorDTO>> updateProfile(@RequestBody DoctorDTO profileData) {
+        DoctorDTO updated = doctorService.updateProfile(profileData);
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Profile updated successfully", updated)
+        );
+    }
+
+
+
     //TODO return updated schedule
     @PostMapping("/{id}/schedule")
     public ResponseEntity<ApiResponse<Void>> updateSchedule(@PathVariable Long id, @RequestBody String availability) {
         doctorService.updateSchedule(id, availability);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(true,"Update Schedule successfully",null));
-
 
     }
 
