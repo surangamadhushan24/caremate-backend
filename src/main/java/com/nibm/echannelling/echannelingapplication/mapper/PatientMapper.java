@@ -19,6 +19,5 @@ public interface PatientMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "email", ignore = true)
     void updateFromRequest(UpdatePatientRequest request, @MappingTarget Patient patient);
 }
