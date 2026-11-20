@@ -19,7 +19,6 @@ public class Patient {
 
     @Column(nullable = false)
     private String name;
-
     private Integer age;
     private String gender;
     private String phone;
