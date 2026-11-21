@@ -36,8 +36,9 @@ public class PatientService {
         return patientMapper.toDto(patient);
     }
 
-    public void updatePatient(UpdatePatientRequest request) {
+    public PatientDTO updatePatient(UpdatePatientRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
 
         Patient patient = patientRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found with email: " + email));
@@ -52,7 +53,8 @@ public class PatientService {
             userRepository.save(patient.getUser());
         }
 
-        patientRepository.save(patient);
+        Patient savedUpdatedPatient = patientRepository.save(patient);
+        return patientMapper.toDto(savedUpdatedPatient);
     }
 
     public List<PatientDTO> getAllPatients() {

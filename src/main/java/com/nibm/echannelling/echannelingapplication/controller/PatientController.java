@@ -39,9 +39,9 @@ public class PatientController {
     //TODO return updated patient <ApiResponse<PatientDTO>>
 
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse<Void>> updatePatient(@RequestBody UpdatePatientRequest request) {
-        patientService.updatePatient(request);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(true,"Update Patient details successfully",null));
+    public ResponseEntity<ApiResponse<PatientDTO>> updatePatient(@RequestBody UpdatePatientRequest request) {
+        PatientDTO patientDTO = patientService.updatePatient(request);
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(true,"Update Patient details successfully",patientDTO));
 
     }
 }
