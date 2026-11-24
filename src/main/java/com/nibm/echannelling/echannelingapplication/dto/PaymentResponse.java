@@ -1,11 +1,18 @@
 package com.nibm.echannelling.echannelingapplication.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.Map;
 
-@Data
+@Getter
+@Setter
 public class PaymentResponse {
+
     private String paymentUrl;
     private String payhereOrderId;
     private String status;
+    private Map<String, String> paymentData;
+
+
 }

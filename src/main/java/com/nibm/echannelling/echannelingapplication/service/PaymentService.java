@@ -9,14 +9,9 @@ import com.nibm.echannelling.echannelingapplication.entity.User;
 import com.nibm.echannelling.echannelingapplication.repository.AppointmentRepository;
 import com.nibm.echannelling.echannelingapplication.repository.PaymentRepository;
 import com.nibm.echannelling.echannelingapplication.repository.UserRepository;
-import org.springframework.stereotype.Service;
-
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -27,7 +22,6 @@ import java.util.UUID;
 
 @Service
 public class PaymentService {
-
 
     private final PaymentRepository paymentRepository;
     private final AppointmentRepository appointmentRepository;
@@ -42,7 +36,9 @@ public class PaymentService {
     @Value("${payhere.base.url}")
     private String payhereBaseUrl;
 
-    public PaymentService(PaymentRepository paymentRepository, AppointmentRepository appointmentRepository, UserRepository userRepository) {
+    public PaymentService(PaymentRepository paymentRepository,
+                          AppointmentRepository appointmentRepository,
+                          UserRepository userRepository) {
         this.paymentRepository = paymentRepository;
         this.appointmentRepository = appointmentRepository;
         this.userRepository = userRepository;
@@ -52,10 +48,12 @@ public class PaymentService {
     public PaymentResponse initiatePayment(PaymentRequest request) {
         Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         String orderId = UUID.randomUUID().toString();
+
         Payment payment = new Payment();
         payment.setAppointment(appointment);
         payment.setUser(user);
@@ -65,10 +63,12 @@ public class PaymentService {
         payment.setPayhereOrderId(orderId);
         paymentRepository.save(payment);
 
+        String formattedAmount = String.format("%.2f", request.getAmount());
+
         String hash = generatePayhereHash(
                 merchantId,
                 orderId,
-                request.getAmount().toString(),
+                formattedAmount,
                 request.getCurrency(),
                 merchantSecret
         );
@@ -81,7 +81,7 @@ public class PaymentService {
         paymentData.put("order_id", orderId);
         paymentData.put("items", "Appointment Payment");
         paymentData.put("currency", request.getCurrency());
-        paymentData.put("amount", request.getAmount().toString());
+        paymentData.put("amount", formattedAmount);
         paymentData.put("first_name", request.getFirstName());
         paymentData.put("last_name", request.getLastName());
         paymentData.put("email", request.getEmail());
@@ -97,6 +97,8 @@ public class PaymentService {
         response.setPaymentUrl(paymentUrl);
         response.setPayhereOrderId(orderId);
         response.setStatus("INITIATED");
+        response.setPaymentData(paymentData);
+
         return response;
     }
 
@@ -111,7 +113,6 @@ public class PaymentService {
             throw new RuntimeException("Payment not found");
         }
 
-        // Verify PayHere signature
         String localMd5sig = generatePayhereNotificationHash(
                 notification.get("merchant_id"),
                 orderId,
@@ -141,10 +142,21 @@ public class PaymentService {
         paymentRepository.save(payment);
     }
 
-    private String generatePayhereHash(String merchantId, String orderId, String amount, String currency, String merchantSecret) {
-        String hashInput = merchantId + orderId + amount + currency + merchantSecret;
+    private String generatePayhereHash(String merchantId, String orderId, String amount,
+                                       String currency, String merchantSecret) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
+
+            // MD5(merchant_secret) then uppercase
+            byte[] secretBytes = md.digest(merchantSecret.getBytes(StandardCharsets.UTF_8));
+            StringBuilder secretSb = new StringBuilder();
+            for (byte b : secretBytes) {
+                secretSb.append(String.format("%02x", b));
+            }
+            String hashedSecret = secretSb.toString().toUpperCase();
+
+            String hashInput = merchantId + orderId + amount + currency + hashedSecret;
+
             byte[] hashBytes = md.digest(hashInput.getBytes(StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder();
             for (byte b : hashBytes) {
@@ -156,10 +168,20 @@ public class PaymentService {
         }
     }
 
-    private String generatePayhereNotificationHash(String merchantId, String orderId, String amount, String currency, String statusCode, String merchantSecret) {
-        String hashInput = merchantId + orderId + amount + currency + statusCode + merchantSecret.toUpperCase();
+    private String generatePayhereNotificationHash(String merchantId, String orderId, String amount,
+                                                   String currency, String statusCode, String merchantSecret) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
+
+            byte[] secretBytes = md.digest(merchantSecret.getBytes(StandardCharsets.UTF_8));
+            StringBuilder secretSb = new StringBuilder();
+            for (byte b : secretBytes) {
+                secretSb.append(String.format("%02x", b));
+            }
+            String hashedSecret = secretSb.toString().toUpperCase();
+
+            String hashInput = merchantId + orderId + amount + currency + statusCode + hashedSecret;
+
             byte[] hashBytes = md.digest(hashInput.getBytes(StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder();
             for (byte b : hashBytes) {
@@ -174,6 +196,7 @@ public class PaymentService {
     public PaymentDTO getPaymentById(Long id) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
+
         PaymentDTO dto = new PaymentDTO();
         dto.setId(payment.getId());
         dto.setAppointmentId(payment.getAppointment().getId());
