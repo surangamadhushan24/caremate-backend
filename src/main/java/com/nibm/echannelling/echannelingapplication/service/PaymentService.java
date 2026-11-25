@@ -99,6 +99,15 @@ public class PaymentService {
         response.setStatus("INITIATED");
         response.setPaymentData(paymentData);
 
+
+
+        System.out.println("===== PAYHERE DEBUG =====");
+        System.out.println("merchant_id : " + merchantId);
+        System.out.println("order_id    : " + orderId);
+        System.out.println("amount      : " + formattedAmount);
+        System.out.println("currency    : " + request.getCurrency());
+        System.out.println("hash        : " + hash);
+        System.out.println("=========================");
         return response;
     }
 
