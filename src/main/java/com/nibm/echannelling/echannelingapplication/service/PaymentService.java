@@ -9,10 +9,13 @@ import com.nibm.echannelling.echannelingapplication.entity.User;
 import com.nibm.echannelling.echannelingapplication.repository.AppointmentRepository;
 import com.nibm.echannelling.echannelingapplication.repository.PaymentRepository;
 import com.nibm.echannelling.echannelingapplication.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +25,8 @@ import java.util.UUID;
 
 @Service
 public class PaymentService {
+
+    private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
 
     private final PaymentRepository paymentRepository;
     private final AppointmentRepository appointmentRepository;
@@ -99,27 +104,21 @@ public class PaymentService {
         response.setStatus("INITIATED");
         response.setPaymentData(paymentData);
 
-
-
-        System.out.println("===== PAYHERE DEBUG =====");
-        System.out.println("merchant_id : " + merchantId);
-        System.out.println("order_id    : " + orderId);
-        System.out.println("amount      : " + formattedAmount);
-        System.out.println("currency    : " + request.getCurrency());
-        System.out.println("hash        : " + hash);
-        System.out.println("=========================");
         return response;
     }
 
     @Transactional
     public void handlePaymentNotification(Map<String, String> notification) {
+        log.info("PayHere notification received: order_id={}, status_code={}",
+                notification.get("order_id"), notification.get("status_code"));
+
         String orderId = notification.get("order_id");
         String statusCode = notification.get("status_code");
         String md5sig = notification.get("md5sig");
 
         Payment payment = paymentRepository.findByPayhereOrderId(orderId);
         if (payment == null) {
-            throw new RuntimeException("Payment not found");
+            throw new RuntimeException("Payment not found for order " + orderId);
         }
 
         String localMd5sig = generatePayhereNotificationHash(
@@ -131,13 +130,29 @@ public class PaymentService {
                 merchantSecret
         );
 
-        if (!localMd5sig.equalsIgnoreCase(md5sig)) {
+        if (md5sig == null || !localMd5sig.equalsIgnoreCase(md5sig)) {
             throw new RuntimeException("Invalid signature");
         }
 
+        if ("COMPLETED".equals(payment.getStatus())) {
+            return;
+        }
+
         if ("2".equals(statusCode)) {
+
+            BigDecimal paid = new BigDecimal(notification.get("payhere_amount"));
+            BigDecimal expected = BigDecimal.valueOf(payment.getAmount().doubleValue());
+            if (paid.compareTo(expected) != 0) {
+                throw new RuntimeException("Amount mismatch for order " + orderId);
+            }
+
             payment.setStatus("COMPLETED");
             payment.setTransactionId(notification.get("payment_id"));
+
+            Appointment appointment = payment.getAppointment();
+            appointment.setStatus("CONFIRMED");
+            appointmentRepository.save(appointment);
+
         } else if ("0".equals(statusCode)) {
             payment.setStatus("PENDING");
         } else if ("-1".equals(statusCode)) {
@@ -151,24 +166,27 @@ public class PaymentService {
         paymentRepository.save(payment);
     }
 
-    private String generatePayhereHash(String merchantId, String orderId, String amount,
-                                       String currency, String merchantSecret) {
+    @Transactional(readOnly = true)
+    public String getPaymentStatusByOrderId(String orderId, String currentUserEmail) {
+        Payment payment = paymentRepository.findByPayhereOrderId(orderId);
+        if (payment == null) {
+            throw new RuntimeException("Payment not found");
+        }
+
+        if (payment.getUser() != null
+                && payment.getUser().getEmail() != null
+                && !payment.getUser().getEmail().equalsIgnoreCase(currentUserEmail)) {
+            throw new RuntimeException("Not allowed to view this payment");
+        }
+        return payment.getStatus();
+    }
+
+    private String md5Upper(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-
-            // MD5(merchant_secret) then uppercase
-            byte[] secretBytes = md.digest(merchantSecret.getBytes(StandardCharsets.UTF_8));
-            StringBuilder secretSb = new StringBuilder();
-            for (byte b : secretBytes) {
-                secretSb.append(String.format("%02x", b));
-            }
-            String hashedSecret = secretSb.toString().toUpperCase();
-
-            String hashInput = merchantId + orderId + amount + currency + hashedSecret;
-
-            byte[] hashBytes = md.digest(hashInput.getBytes(StandardCharsets.UTF_8));
+            byte[] bytes = md.digest(input.getBytes(StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder();
-            for (byte b : hashBytes) {
+            for (byte b : bytes) {
                 sb.append(String.format("%02x", b));
             }
             return sb.toString().toUpperCase();
@@ -177,29 +195,16 @@ public class PaymentService {
         }
     }
 
+    private String generatePayhereHash(String merchantId, String orderId, String amount,
+                                       String currency, String merchantSecret) {
+        String hashedSecret = md5Upper(merchantSecret);
+        return md5Upper(merchantId + orderId + amount + currency + hashedSecret);
+    }
+
     private String generatePayhereNotificationHash(String merchantId, String orderId, String amount,
                                                    String currency, String statusCode, String merchantSecret) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-
-            byte[] secretBytes = md.digest(merchantSecret.getBytes(StandardCharsets.UTF_8));
-            StringBuilder secretSb = new StringBuilder();
-            for (byte b : secretBytes) {
-                secretSb.append(String.format("%02x", b));
-            }
-            String hashedSecret = secretSb.toString().toUpperCase();
-
-            String hashInput = merchantId + orderId + amount + currency + statusCode + hashedSecret;
-
-            byte[] hashBytes = md.digest(hashInput.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString().toUpperCase();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found", e);
-        }
+        String hashedSecret = md5Upper(merchantSecret);
+        return md5Upper(merchantId + orderId + amount + currency + statusCode + hashedSecret);
     }
 
     public PaymentDTO getPaymentById(Long id) {
